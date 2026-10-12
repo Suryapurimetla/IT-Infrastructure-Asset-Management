@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Allocate Asset | ITAM</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 6%;
+        }
+        main {
+            max-width: 600px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+        form {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #0001;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 20px 0 8px;
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+        }
+        button, .back {
+            display: inline-block;
+            margin-top: 22px;
+            padding: 12px 18px;
+            border: 0;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .back { background: #64748b; margin-left: 8px; }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Allocate Asset</h1>
+    <p>Assign an IT asset to an employee</p>
+</header>
+
+<main>
+    <form method="post">
+        {% csrf_token %}
+
+        <h2>{{ asset.name }}</h2>
+        <p><strong>Asset ID:</strong> {{ asset.asset_id }}</p>
+        <p><strong>Current status:</strong> {{ asset.get_status_display }}</p>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <label for="allocated_to">Employee Name *</label>
+        <input
+            id="allocated_to"
+            name="allocated_to"
+            value="{{ asset.allocated_to }}"
+            required
+            maxlength="100"
+            placeholder="Enter employee name"
+        >
+
+        <button type="submit">Confirm Allocation</button>
+        <a class="back" href="/">Cancel</a>
+    </form>
+</main>
+</body>
+</html>

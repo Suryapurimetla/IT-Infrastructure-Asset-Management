@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Asset | ITAM</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 6%;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        header p {
+            margin: 0;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            margin-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font: inherit;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        .error {
+            color: #991b1b;
+            background: #fee2e2;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+        }
+
+        .actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .cancel {
+            background: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <h1>Edit Asset</h1>
+    <p>Update IT asset information</p>
+</header>
+
+<main>
+    <div class="card">
+        <h2>Asset Details</h2>
+        <p>Update the information below and save your changes.</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="grid">
+                <div class="field">
+                    <label for="asset_id">Asset ID *</label>
+                    <input
+                        type="text"
+                        id="asset_id"
+                        name="asset_id"
+                        value="{{ asset.asset_id }}"
+                        required
+                        maxlength="20"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="name">Asset Name *</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{ asset.name }}"
+                        required
+                        maxlength="100"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required>
+                        {% for value, label in asset.CATEGORY_CHOICES %}
+                            <option value="{{ value }}"
+                                {% if asset.category == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% empty %}
+                            <option value="Hardware"
+                                {% if asset.category == 'Hardware' %}selected{% endif %}>
+                                Hardware
+                            </option>
+                            <option value="Software"
+                                {% if asset.category == 'Software' %}selected{% endif %}>
+                                Software
+                            </option>
+                            <option value="Network"
+                                {% if asset.category == 'Network' %}selected{% endif %}>
+                                Network Equipment
+                            </option>
+                            <option value="Other"
+                                {% if asset.category == 'Other' %}selected{% endif %}>
+                                Other
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="brand">Brand</label>
+                    <input
+                        type="text"
+                        id="brand"
+                        name="brand"
+                        value="{{ asset.brand }}"
+                        maxlength="100"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="model_number">Model Number</label>
+                    <input
+                        type="text"
+                        id="model_number"
+                        name="model_number"
+                        value="{{ asset.model_number }}"
+                        maxlength="100"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="serial_number">Serial Number</label>
+                    <input
+                        type="text"
+                        id="serial_number"
+                        name="serial_number"
+                        value="{{ asset.serial_number }}"
+                        maxlength="100"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="purchase_date">Purchase Date</label>
+                    <input
+                        type="date"
+                        id="purchase_date"
+                        name="purchase_date"
+                        value="{{ asset.purchase_date|date:'Y-m-d' }}"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="warranty_expiry">Warranty Expiry</label>
+                    <input
+                        type="date"
+                        id="warranty_expiry"
+                        name="warranty_expiry"
+                        value="{{ asset.warranty_expiry|date:'Y-m-d' }}"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="status">Status *</label>
+                    <select id="status" name="status" required>
+                        <option value="Available"
+                            {% if asset.status == 'Available' %}selected{% endif %}>
+                            Available
+                        </option>
+                        <option value="Allocated"
+                            {% if asset.status == 'Allocated' %}selected{% endif %}>
+                            Allocated
+                        </option>
+                        <option value="Under Maintenance"
+                            {% if asset.status == 'Under Maintenance' %}selected{% endif %}>
+                            Under Maintenance
+                        </option>
+                        <option value="Retired"
+                            {% if asset.status == 'Retired' %}selected{% endif %}>
+                            Retired
+                        </option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="allocated_to">Allocated To</label>
+                    <input
+                        type="text"
+                        id="allocated_to"
+                        name="allocated_to"
+                        value="{{ asset.allocated_to }}"
+                        maxlength="100"
+                    >
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="button" type="submit">Save Changes</button>
+                <a class="button cancel" href="{% url 'dashboard' %}">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

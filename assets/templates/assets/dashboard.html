@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ITAM | Asset Dashboard</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 24px 5%;
+        }
+
+        header h1 { margin: 0 0 8px; }
+        header p { margin: 0; color: #cbd5e1; }
+
+        main {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 22px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, .06);
+        }
+
+        .card p { color: #64748b; margin: 0 0 12px; }
+        .number { font-size: 30px; font-weight: bold; }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .toolbar h2 { margin: 0; }
+
+        .button {
+            display: inline-block;
+            padding: 10px 13px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            font-family: inherit;
+        }
+
+        .edit { background: #0f766e; }
+        .allocate { background: #7c3aed; }
+        .maintenance { background: #d97706; }
+        .delete { background: #dc2626; }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .search-form input {
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            min-width: 240px;
+            font-size: 14px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, .06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1050px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 15px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        td { font-size: 13px; }
+
+        .status {
+            display: inline-block;
+            padding: 6px 9px;
+            border-radius: 20px;
+            background: #e2e8f0;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .available { background: #dcfce7; color: #166534; }
+        .allocated { background: #dbeafe; color: #1d4ed8; }
+        .under-maintenance { background: #fef3c7; color: #92400e; }
+        .retired { background: #fee2e2; color: #991b1b; }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .actions .button { padding: 8px 10px; }
+
+        .empty {
+            text-align: center;
+            padding: 35px;
+            color: #64748b;
+        }
+
+        @media (max-width: 800px) {
+            .summary { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .summary { grid-template-columns: 1fr; }
+            .search-form input { min-width: 0; width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <h1>IT Infrastructure &amp; Asset Management</h1>
+    <p>Manage, track, allocate, and maintain your IT assets</p>
+</header>
+
+<main>
+    <section class="summary">
+        <div class="card">
+            <p>Total Assets</p>
+            <div class="number">{{ total_assets }}</div>
+        </div>
+
+        <div class="card">
+            <p>Available</p>
+            <div class="number">{{ available_assets }}</div>
+        </div>
+
+        <div class="card">
+            <p>Allocated</p>
+            <div class="number">{{ allocated_assets }}</div>
+        </div>
+
+        <div class="card">
+            <p>Under Maintenance</p>
+            <div class="number">{{ maintenance_assets }}</div>
+        </div>
+    </section>
+
+    <div class="toolbar">
+        <h2>Asset Inventory</h2>
+        <a class="button" href="{% url 'add_asset' %}">+ Add Asset</a>
+    </div>
+
+    <div class="toolbar">
+        <form class="search-form" method="get" action="{% url 'dashboard' %}">
+            <input
+                type="search"
+                name="q"
+                value="{{ query }}"
+                placeholder="Search by ID, name, or brand"
+            >
+            <button class="button" type="submit">Search</button>
+            <a class="button" href="{% url 'dashboard' %}">Clear</a>
+        </form>
+
+        <a class="button" href="/admin/">Admin Panel</a>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset ID</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Brand</th>
+                    <th>Status</th>
+                    <th>Allocated To</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for asset in assets %}
+                <tr>
+                    <td>{{ asset.asset_id }}</td>
+                    <td>{{ asset.name }}</td>
+                    <td>{{ asset.get_category_display }}</td>
+                    <td>{{ asset.brand|default:"—" }}</td>
+                    <td>
+                        <span class="status {% if asset.status == 'Available' %}available{% elif asset.status == 'Allocated' %}allocated{% elif asset.status == 'Under Maintenance' %}under-maintenance{% elif asset.status == 'Retired' %}retired{% endif %}">
+                            {{ asset.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ asset.allocated_to|default:"—" }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="button edit"
+                               href="{% url 'edit_asset' asset.id %}">Edit</a>
+
+                            <a class="button allocate"
+                               href="{% url 'allocate_asset' asset.id %}">Allocate</a>
+
+                            <a class="button maintenance"
+                               href="{% url 'maintain_asset' asset.id %}">Maintenance</a>
+
+                            <a class="button delete"
+                               href="{% url 'delete_asset' asset.id %}">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty">
+                        No assets found. Click Add Asset to register your first asset.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

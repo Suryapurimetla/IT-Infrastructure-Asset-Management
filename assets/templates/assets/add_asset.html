@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Asset | ITAM</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f1f5f9; color: #1e293b; }
+        header { background: #172554; color: white; padding: 22px 6%; }
+        main { max-width: 760px; margin: 30px auto; padding: 0 20px; }
+        form { background: white; padding: 28px; border-radius: 12px; box-shadow: 0 2px 8px #0001; }
+        .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        label { display: block; font-weight: bold; margin-bottom: 7px; }
+        input, select { width: 100%; box-sizing: border-box; padding: 11px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
+        .field { margin-bottom: 18px; }
+        button, .back { display: inline-block; border: 0; background: #2563eb; color: white; padding: 12px 18px; border-radius: 7px; text-decoration: none; cursor: pointer; font-size: 15px; }
+        .back { background: #64748b; margin-left: 8px; }
+        .error { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 6px; margin-bottom: 18px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header>
+    <h1>ITAM — Add Asset</h1>
+    <p>Register a hardware or software asset</p>
+</header>
+<main>
+    <form method="post">
+        {% csrf_token %}
+        <h2>Asset Details</h2>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <div class="grid">
+            <div class="field">
+                <label for="asset_id">Asset ID *</label>
+                <input id="asset_id" name="asset_id" required maxlength="20" value="{{ form_data.asset_id|default:'' }}">
+            </div>
+            <div class="field">
+                <label for="name">Asset Name *</label>
+                <input id="name" name="name" required maxlength="100" value="{{ form_data.name|default:'' }}">
+            </div>
+            <div class="field">
+                <label for="category">Category *</label>
+                <select id="category" name="category" required>
+                    <option value="">Choose category</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="Software">Software</option>
+                    <option value="Network">Network Equipment</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="brand">Brand</label>
+                <input id="brand" name="brand" maxlength="100" value="{{ form_data.brand|default:'' }}">
+            </div>
+            <div class="field">
+                <label for="model_number">Model Number</label>
+                <input id="model_number" name="model_number" maxlength="100" value="{{ form_data.model_number|default:'' }}">
+            </div>
+            <div class="field">
+                <label for="serial_number">Serial Number</label>
+                <input id="serial_number" name="serial_number" maxlength="100" value="{{ form_data.serial_number|default:'' }}">
+            </div>
+            <div class="field">
+                <label for="purchase_date">Purchase Date</label>
+                <input type="date" id="purchase_date" name="purchase_date" value="{{ form_data.purchase_date|default:'' }}">
+            </div>
+            <div class="field">
+                <label for="warranty_expiry">Warranty Expiry</label>
+                <input type="date" id="warranty_expiry" name="warranty_expiry" value="{{ form_data.warranty_expiry|default:'' }}">
+            </div>
+            <div class="field">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="Available">Available</option>
+                    <option value="Allocated">Allocated</option>
+                    <option value="Under Maintenance">Under Maintenance</option>
+                    <option value="Retired">Retired</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="allocated_to">Allocated To</label>
+                <input id="allocated_to" name="allocated_to" maxlength="100" value="{{ form_data.allocated_to|default:'' }}">
+            </div>
+        </div>
+
+        <button type="submit">Save Asset</button>
+        <a class="back" href="/">Back to Dashboard</a>
+    </form>
+</main>
+</body>
+</html>
