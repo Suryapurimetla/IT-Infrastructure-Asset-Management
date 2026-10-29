@@ -9,22 +9,40 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      DJANGO_SECRET_KEY: test-only-secret-key
+      DB_PASSWORD: test-password
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test-password
+          MYSQL_DATABASE: itam_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install "Django==5.2.18" mysqlclient
+          pip install "Django==5.2.18" "mysqlclient==2.3.0"
 
       - name: Run Django system checks
-        env:
-          DJANGO_SECRET_KEY: test-only-secret-key
-          DB_PASSWORD: test-password
         run: python manage.py check
+
+      - name: Run Django tests
+        run: python manage.py test --verbosity 2
