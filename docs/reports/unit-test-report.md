@@ -1,35 +1,38 @@
-# Unit Test Report
+﻿# Unit Test Report
 
 ## Project
-IT Infrastructure and Asset Management System  
+IT Infrastructure and Asset Management System
 Team 08
 
-## Report status
-Preliminary test run  
-Date: 30 October 2026  
-Branch: main  
-Commit tested: af60472
+## Report Status
+Preliminary test run — working tree version
 
-## Test environment
-- Python: 3.12
+- Date: 05 November 2026
+- Branch: main
+- Base commit: 07aa1fd
+- Changes tested: Uncommitted working-tree changes
+
+## Test Environment
+- Operating System: Windows
+- Python: 3.12.10
 - Django: 5.2.18
 - Database: MySQL
 - Test database: test_itam_db
 
-## Test command
-`& "$env:TEMP\itam-venv312-1030\Scripts\python.exe" manage.py test --verbosity 2`
+## Test Command
+`python manage.py test --verbosity 2`
 
-## Results summary
+## Results Summary
 
 | Measure | Result |
 |---|---:|
-| Tests found | 5 |
-| Passed | 5 |
+| Tests found | 13 |
+| Passed | 13 |
 | Failed | 0 |
 | Errors | 0 |
 | Skipped | 0 |
 
-## Tests executed
+## Tests Executed
 
 | Test | Result |
 |---|---|
@@ -38,11 +41,31 @@ Commit tested: af60472
 | Maintenance rejects invalid status | Pass |
 | Maintenance requires description | Pass |
 | Valid maintenance updates asset status | Pass |
+| Add asset successfully | Pass |
+| Add asset rejects missing required fields | Pass |
+| Add asset rejects duplicate asset ID | Pass |
+| Add asset rejects invalid category | Pass |
+| Edit asset successfully | Pass |
+| Edit asset rejects duplicate asset ID | Pass |
+| Delete asset successfully | Pass |
+| Dashboard search by asset name | Pass |
+
+## System Check
+Django system check completed successfully with no issues.
 
 ## Conclusion
-All five automated tests passed. Django reported no system check issues. The test database was created for the run and removed afterward.
+All 13 automated tests passed. The test database was created for the test run and removed afterward.
 
-## Scope and limitations
-This run covers asset allocation and maintenance status validation. It does not cover all project features or the full system validation. Code coverage and branch coverage are not measured in this report.
+## Scope and Limitations
+The tests cover asset allocation, maintenance status validation, asset registration, duplicate validation, editing, deletion and dashboard search.
 
-Update this report after the team completes testing during November 2-6. Include the final test run, commit, counts, and any unresolved failures.
+The test suite does not establish complete system validation against every SRS requirement.
+
+## Coverage Results
+
+- Statement coverage: 95.12%
+- Branch coverage: 72.22%
+- Combined coverage: 92.20%
+
+## Next Steps
+Perform additional system validation, review uncovered branches, and update this report after the final test execution on the committed version.
