@@ -14,6 +14,8 @@ Description: This feature allows authorized users to register and maintain hardw
 | ITAM-F-004 | The system shall allow authorized users to view and search asset records. | Functional | High | IT Administrator / Staff | A search returns matching records for the entered criteria. Test: TC-ITAM-04 | Search fields depend on implementation. |
 | ITAM-F-005 | The system shall allow authorized users to update existing asset information. | Functional | High | IT Administrator | Updated details are saved and displayed correctly. Test: TC-ITAM-05 | Requires an existing asset record. |
 
+| ITAM-F-016 | The system shall allow authorized users to delete existing asset records. | Functional | Medium | IT Administrator | The selected asset is removed from the inventory. Test: TC-ITAM-16 | Deletion should apply to the selected asset. |
+
 ## 4.2 Asset Allocation and Status
 
 Description: This feature manages asset assignments and current asset status.

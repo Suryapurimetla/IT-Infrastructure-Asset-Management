@@ -1,4 +1,4 @@
-﻿venv/
+venv/
 __pycache__/
 *.py[cod]
 .env
@@ -9,4 +9,4 @@ db.sqlite3
 # Coverage reports and temporary data
 .coverage
 coverage-summary.json
-htmlcov/
+/htmlcov/
