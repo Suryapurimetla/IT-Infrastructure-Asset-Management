@@ -1,8 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Asset
-
+from .models import Asset, MaintenanceRecord
 
 class AssetAllocationTests(TestCase):
     def setUp(self):
@@ -56,6 +55,28 @@ class AssetMaintenanceTests(TestCase):
         self.asset.refresh_from_db()
         self.assertEqual(self.asset.status, "Under Maintenance")
 
+
+    def test_maintenance_creates_history_record(self):
+        response = self.client.post(
+            reverse("maintain_asset", args=[self.asset.pk]),
+            {
+                "description": "Replaced cooling fan",
+                "status": "Under Maintenance",
+            },
+        )
+
+        self.assertRedirects(response, reverse("dashboard"))
+
+        self.asset.refresh_from_db()
+
+        self.assertEqual(self.asset.status, "Under Maintenance")
+
+        record = MaintenanceRecord.objects.get(asset=self.asset)
+
+        self.assertEqual(record.description, "Replaced cooling fan")
+        self.assertEqual(record.previous_status, "Available")
+        self.assertEqual(record.new_status, "Under Maintenance")
+
     def test_maintenance_requires_description(self):
         response = self.client.post(
             reverse("maintain_asset", args=[self.asset.pk]),
@@ -73,7 +94,7 @@ class AssetMaintenanceTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Please select a valid status.")
-        
+
 
 
 

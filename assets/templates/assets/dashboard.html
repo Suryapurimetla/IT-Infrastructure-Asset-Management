@@ -77,6 +77,7 @@
         .allocate { background: #7c3aed; }
         .maintenance { background: #d97706; }
         .delete { background: #dc2626; }
+        .history { background: #475569; }
 
         .search-form {
             display: flex;
@@ -102,7 +103,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1050px;
+            min-width: 1250px;
         }
 
         th, td {
@@ -133,6 +134,74 @@
         .allocated { background: #dbeafe; color: #1d4ed8; }
         .under-maintenance { background: #fef3c7; color: #92400e; }
         .retired { background: #fee2e2; color: #991b1b; }
+
+        /* Warranty status styles */
+        .warranty-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .warranty-expiring {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .warranty-expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .warranty-none {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+/* Warranty expiry alerts */
+.alert-section {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 25px;
+}
+
+.alert-section h2 {
+    margin: 0 0 15px;
+    color: #9a3412;
+}
+
+.alert-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.alert-item:last-child {
+    margin-bottom: 0;
+}
+
+.alert-name {
+    font-weight: bold;
+}
+
+.alert-date {
+    color: #c2410c;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.no-alerts {
+    color: #166534;
+    background: #dcfce7;
+    padding: 14px;
+    border-radius: 8px;
+}
 
         .actions {
             display: flex;
@@ -166,6 +235,8 @@
 </header>
 
 <main>
+
+    <!-- Asset Summary -->
     <section class="summary">
         <div class="card">
             <p>Total Assets</p>
@@ -188,6 +259,66 @@
         </div>
     </section>
 
+    <!-- Warranty Summary -->
+    <h2>Warranty Overview</h2>
+
+    <section class="summary">
+        <div class="card">
+            <p>Active Warranties</p>
+            <div class="number">{{ active_warranties }}</div>
+        </div>
+
+        <div class="card">
+            <p>Expiring Soon</p>
+            <div class="number">{{ expiring_warranties }}</div>
+        </div>
+
+        <div class="card">
+            <p>Expired Warranties</p>
+            <div class="number">{{ expired_warranties }}</div>
+        </div>
+
+        <div class="card">
+            <p>No Warranty Date</p>
+            <div class="number">{{ no_warranty_date }}</div>
+        </div>
+    </section>
+<!-- Warranty Expiry Alerts -->
+<section class="alert-section">
+
+    <h2>⚠ Warranty Expiry Alerts</h2>
+
+    {% for asset in expiring_assets %}
+    <div class="alert-item">
+
+        <div>
+            <div class="alert-name">
+                {{ asset.name }} ({{ asset.asset_id }})
+            </div>
+
+            <small>Warranty is approaching its expiry date.</small>
+        </div>
+
+        <div class="alert-date">
+    Expires: {{ asset.warranty_expiry|date:"d M Y" }}
+
+    {% if asset.days_remaining == 0 %}
+        <br>Expires Today!
+    {% else %}
+        <br>{{ asset.days_remaining }} days left
+    {% endif %}
+</div>
+
+    </div>
+
+    {% empty %}
+    <div class="no-alerts">
+        ✓ No warranties are expiring within the next 30 days.
+    </div>
+    {% endfor %}
+
+</section>
+    <!-- Asset Inventory -->
     <div class="toolbar">
         <h2>Asset Inventory</h2>
         <a class="button" href="{% url 'add_asset' %}">+ Add Asset</a>
@@ -218,6 +349,7 @@
                     <th>Brand</th>
                     <th>Status</th>
                     <th>Allocated To</th>
+                    <th>Warranty Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -229,12 +361,21 @@
                     <td>{{ asset.name }}</td>
                     <td>{{ asset.get_category_display }}</td>
                     <td>{{ asset.brand|default:"—" }}</td>
+
                     <td>
                         <span class="status {% if asset.status == 'Available' %}available{% elif asset.status == 'Allocated' %}allocated{% elif asset.status == 'Under Maintenance' %}under-maintenance{% elif asset.status == 'Retired' %}retired{% endif %}">
                             {{ asset.get_status_display }}
                         </span>
                     </td>
+
                     <td>{{ asset.allocated_to|default:"—" }}</td>
+
+                    <td>
+                        <span class="status {% if asset.warranty_status == 'Active' %}warranty-active{% elif asset.warranty_status == 'Expiring Soon' %}warranty-expiring{% elif asset.warranty_status == 'Expired' %}warranty-expired{% else %}warranty-none{% endif %}">
+                            {{ asset.warranty_status }}
+                        </span>
+                    </td>
+
                     <td>
                         <div class="actions">
                             <a class="button edit"
@@ -246,14 +387,31 @@
                             <a class="button maintenance"
                                href="{% url 'maintain_asset' asset.id %}">Maintenance</a>
 
+                            <a class="button history"
+   href="{% url 'allocation_history' asset.id %}">
+    Allocation History
+</a>
+
+{% if asset.status == 'Allocated' %}
+<form method="POST" action="{% url 'return_asset' asset.id %}">
+    {% csrf_token %}
+    <button class="button" type="submit"
+            style="background: #16a34a;">
+        Return Asset
+    </button>
+</form>
+{% endif %}
+
+
                             <a class="button delete"
                                href="{% url 'delete_asset' asset.id %}">Delete</a>
                         </div>
                     </td>
                 </tr>
+
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="empty">
+                    <td colspan="8" class="empty">
                         No assets found. Click Add Asset to register your first asset.
                     </td>
                 </tr>
@@ -261,6 +419,7 @@
             </tbody>
         </table>
     </div>
+
 </main>
 </body>
 </html>

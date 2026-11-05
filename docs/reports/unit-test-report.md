@@ -1,15 +1,14 @@
-﻿# Unit Test Report
+# Unit Test Report
 
 ## Project
-IT Infrastructure and Asset Management System
-Team 08
+**IT Infrastructure and Asset Management System**
+**Team 08**
 
 ## Report Status
-Preliminary test run — working tree version
+Latest test run — uncommitted working-tree version
 
 - Date: 05 November 2026
-- Branch: main
-- Base commit: 07aa1fd
+- Branch: `feature/maintenance-history`
 - Changes tested: Uncommitted working-tree changes
 
 ## Test Environment
@@ -17,20 +16,22 @@ Preliminary test run — working tree version
 - Python: 3.12.10
 - Django: 5.2.18
 - Database: MySQL
-- Test database: test_itam_db
+- Test database: Django test database
 
 ## Test Command
-`python manage.py test --verbosity 2`
+
+`python manage.py test assets`
 
 ## Results Summary
 
 | Measure | Result |
 |---|---:|
-| Tests found | 13 |
-| Passed | 13 |
+| Tests found | 14 |
+| Passed | 14 |
 | Failed | 0 |
 | Errors | 0 |
 | Skipped | 0 |
+| Execution time | 0.209 seconds |
 
 ## Tests Executed
 
@@ -41,6 +42,7 @@ Preliminary test run — working tree version
 | Maintenance rejects invalid status | Pass |
 | Maintenance requires description | Pass |
 | Valid maintenance updates asset status | Pass |
+| Maintenance creates history record | Pass |
 | Add asset successfully | Pass |
 | Add asset rejects missing required fields | Pass |
 | Add asset rejects duplicate asset ID | Pass |
@@ -51,21 +53,34 @@ Preliminary test run — working tree version
 | Dashboard search by asset name | Pass |
 
 ## System Check
+
 Django system check completed successfully with no issues.
 
 ## Conclusion
-All 13 automated tests passed. The test database was created for the test run and removed afterward.
+
+All 14 automated tests passed successfully. No failures or errors were reported. The test database was created for the test execution and destroyed after completion.
 
 ## Scope and Limitations
-The tests cover asset allocation, maintenance status validation, asset registration, duplicate validation, editing, deletion and dashboard search.
 
-The test suite does not establish complete system validation against every SRS requirement.
+The automated tests cover:
+- Asset registration and validation
+- Duplicate Asset ID prevention
+- Asset editing and deletion
+- Dashboard search
+- Asset allocation
+- Maintenance status updates
+- Maintenance history creation
 
-## Coverage Results
+The automated tests do not establish complete system validation against every SRS requirement.
 
-- Statement coverage: 95.12%
-- Branch coverage: 72.22%
-- Combined coverage: 92.20%
+## Coverage Reference
+
+- Statement coverage: 88% (statement-only coverage run).
+- Branch-enabled combined coverage: 84%.
+- Refer to the separate Code Coverage Report and Branch Coverage Report for details.
 
 ## Next Steps
-Perform additional system validation, review uncovered branches, and update this report after the final test execution on the committed version.
+
+- Perform system validation against the submitted SRS and Test Plan.
+- Review uncovered statements and branches.
+- Update the report after final testing on the committed version.

@@ -1,50 +1,75 @@
-﻿# Branch Coverage Report
+# Branch Coverage Report
 
 ## Project
-IT Infrastructure and Asset Management System
-Team 08
+
+**IT Infrastructure and Asset Management System**
+**Team 08**
 
 ## Execution Details
+
 - Date: 05 November 2026
-- Branch: main
-- Commit: 07aa1fd
+- Branch: `feature/maintenance-history`
+- Commit: Uncommitted working-tree version
 - Coverage Tool: Coverage.py 7.17.2
 - Python: 3.12.10
 - Django: 5.2.18
 
 ## Test Command
 
-`python -m coverage erase`
-`python -m coverage run --branch manage.py test`
-`python -m coverage report -m`
+`coverage erase`
+
+`coverage run --branch manage.py test assets`
+
+`coverage json -o docs/coverage.json`
 
 ## Branch Coverage Results
 
 | Measure | Result |
 |---|---:|
-| Total statements | 201 |
-| Covered statements | 140 |
-| Total branches | 36 |
-| Covered branches | 10 |
-| Missing branches | 26 |
-| Statement coverage | 69.65% |
-| Branch coverage | 27.78% |
-| Combined coverage | 63.29% |
-| Tests passed | 5 |
+| Total statements | 324 |
+| Covered lines | 284 |
+| Missing lines | 40 |
+| Statement coverage | 87.65% (88%) |
+| Total branches | 52 |
+| Covered branches | 31 |
+| Missing branches | 21 |
+| Partially covered branches | 13 |
+| Standalone branch coverage | 59.62% (60%) |
+| Combined coverage | 83.78% (84%) |
+| Tests executed | 14 |
+| Tests passed | 14 |
 | Tests failed | 0 |
 
 ## Observations
 
-The current automated tests cover 10 out of 36 identified branches.
+The branch-enabled coverage execution identified 52 branches across the application.
 
-The remaining 26 branches require additional test scenarios to exercise alternative decision outcomes.
+Out of these, 31 branches were covered and 21 branches were missing.
 
-The assets/views.py module is a major area requiring additional test coverage.
+The report also identified 13 partially covered branches, indicating that some alternative decision paths have not been fully exercised.
+
+The application achieved approximately 60% standalone branch coverage and 84% combined statement and branch coverage.
+
+Further testing can improve coverage of alternative conditional paths, particularly in application views.
 
 ## Limitations
 
-The results represent the current five-test suite and should not be interpreted as complete application testing.
+This report reflects the 14 automated tests executed on 05 November 2026 against the uncommitted working-tree version.
+
+The report does not establish complete branch coverage or complete validation of all application requirements.
 
 ## Conclusion
 
-All five automated tests passed. Additional tests covering valid and invalid inputs, conditional outcomes and different application workflows are required to improve branch coverage.
+All 14 automated tests passed successfully during branch-enabled coverage execution.
+
+The application achieved 59.62% standalone branch coverage and 83.78% combined coverage.
+
+Additional test scenarios are recommended to exercise the remaining uncovered branches.
+
+## Next Steps
+
+- Review missing and partially covered branches.
+- Add automated tests for alternative conditional outcomes.
+- Perform system validation against the SRS and Test Plan.
+- Repeat branch coverage measurement after additional tests.
+- Update this report after testing the committed version.

@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Allocation History | ITAM</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 30px 20px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, .06);
+        }
+
+        h1 { margin-top: 0; }
+
+        .asset-info {
+            background: #eff6ff;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .active {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .returned {
+            color: #64748b;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 22px;
+            padding: 10px 15px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .table-wrapper { overflow-x: auto; }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Asset Allocation History</h1>
+
+    <div class="asset-info">
+        <strong>Asset:</strong> {{ asset.name }}<br>
+        <strong>Asset ID:</strong> {{ asset.asset_id }}<br>
+        <strong>Current Status:</strong> {{ asset.status }}
+    </div>
+
+    <h2>Previous Allocations</h2>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee Name</th>
+                    <th>Allocation Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.employee_name }}</td>
+
+                    <td>
+                        {{ record.allocated_at|date:"d M Y, h:i A" }}
+                    </td>
+
+                    <td>
+                        {% if record.returned_at %}
+                            {{ record.returned_at|date:"d M Y, h:i A" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if record.returned_at %}
+                            <span class="returned">Returned</span>
+                        {% else %}
+                            <span class="active">Currently Allocated</span>
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty">
+                        No allocation history found for this asset.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="button">
+        Back to Dashboard
+    </a>
+
+</div>
+</body>
+</html>
