@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
-from django.utils import timezone
 
 from .models import Asset, MaintenanceRecord, AllocationRecord
+
 
 # ==========================================
 # DASHBOARD
@@ -174,24 +174,31 @@ def edit_asset(request, asset_id):
         category = request.POST.get('category', '')
         status = request.POST.get('status', 'Available')
 
+        # Validate required fields
         if not new_asset_id or not name:
             return render(request, 'assets/edit_asset.html', {
                 'asset': asset,
                 'error': 'Asset ID and Name are required.',
+                'form_data': request.POST,
             })
 
+        # Validate category
         if category not in dict(Asset.CATEGORY_CHOICES):
             return render(request, 'assets/edit_asset.html', {
                 'asset': asset,
                 'error': 'Please select a valid category.',
+                'form_data': request.POST,
             })
 
+        # Validate status
         if status not in dict(Asset.STATUS_CHOICES):
             return render(request, 'assets/edit_asset.html', {
                 'asset': asset,
                 'error': 'Please select a valid status.',
+                'form_data': request.POST,
             })
 
+        # Prevent duplicate Asset IDs
         duplicate = Asset.objects.filter(
             asset_id=new_asset_id
         ).exclude(id=asset.id).exists()
@@ -200,8 +207,10 @@ def edit_asset(request, asset_id):
             return render(request, 'assets/edit_asset.html', {
                 'asset': asset,
                 'error': 'That Asset ID is already in use.',
+                'form_data': request.POST,
             })
 
+        # Update asset details
         asset.asset_id = new_asset_id
         asset.name = name
         asset.category = category
@@ -214,6 +223,7 @@ def edit_asset(request, asset_id):
         asset.allocated_to = request.POST.get('allocated_to', '').strip()
 
         asset.save()
+
         return redirect('dashboard')
 
     return render(request, 'assets/edit_asset.html', {
@@ -235,16 +245,6 @@ def delete_asset(request, asset_id):
     return render(request, 'assets/delete_asset.html', {
         'asset': asset,
     })
-
-
-# ==========================================
-# ALLOCATE ASSET
-# ==========================================
-
-
-# ==========================================
-# ALLOCATE ASSET
-# ==========================================
 
 
 # ==========================================
@@ -292,7 +292,6 @@ def allocate_asset(request, asset_id):
     })
 
 
-
 # ==========================================
 # ALLOCATION HISTORY
 # ==========================================
@@ -311,6 +310,7 @@ def allocation_history(request, asset_id):
 # ==========================================
 # RETURN ASSET
 # ==========================================
+
 def return_asset(request, asset_id):
     asset = get_object_or_404(Asset, id=asset_id)
 

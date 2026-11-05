@@ -120,6 +120,7 @@
 </head>
 
 <body>
+
 <header>
     <h1>Edit Asset</h1>
     <p>Update IT asset information</p>
@@ -138,13 +139,14 @@
             {% csrf_token %}
 
             <div class="grid">
+
                 <div class="field">
                     <label for="asset_id">Asset ID *</label>
                     <input
                         type="text"
                         id="asset_id"
                         name="asset_id"
-                        value="{{ asset.asset_id }}"
+                        value="{{ form_data.asset_id|default:asset.asset_id }}"
                         required
                         maxlength="20"
                     >
@@ -156,7 +158,7 @@
                         type="text"
                         id="name"
                         name="name"
-                        value="{{ asset.name }}"
+                        value="{{ form_data.name|default:asset.name }}"
                         required
                         maxlength="100"
                     >
@@ -165,29 +167,14 @@
                 <div class="field">
                     <label for="category">Category *</label>
                     <select id="category" name="category" required>
+
                         {% for value, label in asset.CATEGORY_CHOICES %}
                             <option value="{{ value }}"
-                                {% if asset.category == value %}selected{% endif %}>
+                                {% if form_data.category|default:asset.category == value %}selected{% endif %}>
                                 {{ label }}
                             </option>
-                        {% empty %}
-                            <option value="Hardware"
-                                {% if asset.category == 'Hardware' %}selected{% endif %}>
-                                Hardware
-                            </option>
-                            <option value="Software"
-                                {% if asset.category == 'Software' %}selected{% endif %}>
-                                Software
-                            </option>
-                            <option value="Network"
-                                {% if asset.category == 'Network' %}selected{% endif %}>
-                                Network Equipment
-                            </option>
-                            <option value="Other"
-                                {% if asset.category == 'Other' %}selected{% endif %}>
-                                Other
-                            </option>
                         {% endfor %}
+
                     </select>
                 </div>
 
@@ -197,7 +184,7 @@
                         type="text"
                         id="brand"
                         name="brand"
-                        value="{{ asset.brand }}"
+                        value="{{ form_data.brand|default:asset.brand }}"
                         maxlength="100"
                     >
                 </div>
@@ -208,7 +195,7 @@
                         type="text"
                         id="model_number"
                         name="model_number"
-                        value="{{ asset.model_number }}"
+                        value="{{ form_data.model_number|default:asset.model_number }}"
                         maxlength="100"
                     >
                 </div>
@@ -219,7 +206,7 @@
                         type="text"
                         id="serial_number"
                         name="serial_number"
-                        value="{{ asset.serial_number }}"
+                        value="{{ form_data.serial_number|default:asset.serial_number }}"
                         maxlength="100"
                     >
                 </div>
@@ -230,7 +217,7 @@
                         type="date"
                         id="purchase_date"
                         name="purchase_date"
-                        value="{{ asset.purchase_date|date:'Y-m-d' }}"
+                        value="{{ form_data.purchase_date|default:asset.purchase_date|date:'Y-m-d' }}"
                     >
                 </div>
 
@@ -240,29 +227,34 @@
                         type="date"
                         id="warranty_expiry"
                         name="warranty_expiry"
-                        value="{{ asset.warranty_expiry|date:'Y-m-d' }}"
+                        value="{{ form_data.warranty_expiry|default:asset.warranty_expiry|date:'Y-m-d' }}"
                     >
                 </div>
 
                 <div class="field">
                     <label for="status">Status *</label>
                     <select id="status" name="status" required>
+
                         <option value="Available"
-                            {% if asset.status == 'Available' %}selected{% endif %}>
+                            {% if form_data.status|default:asset.status == 'Available' %}selected{% endif %}>
                             Available
                         </option>
+
                         <option value="Allocated"
-                            {% if asset.status == 'Allocated' %}selected{% endif %}>
+                            {% if form_data.status|default:asset.status == 'Allocated' %}selected{% endif %}>
                             Allocated
                         </option>
+
                         <option value="Under Maintenance"
-                            {% if asset.status == 'Under Maintenance' %}selected{% endif %}>
+                            {% if form_data.status|default:asset.status == 'Under Maintenance' %}selected{% endif %}>
                             Under Maintenance
                         </option>
+
                         <option value="Retired"
-                            {% if asset.status == 'Retired' %}selected{% endif %}>
+                            {% if form_data.status|default:asset.status == 'Retired' %}selected{% endif %}>
                             Retired
                         </option>
+
                     </select>
                 </div>
 
@@ -272,20 +264,26 @@
                         type="text"
                         id="allocated_to"
                         name="allocated_to"
-                        value="{{ asset.allocated_to }}"
+                        value="{{ form_data.allocated_to|default:asset.allocated_to }}"
                         maxlength="100"
                     >
                 </div>
+
             </div>
 
             <div class="actions">
-                <button class="button" type="submit">Save Changes</button>
+                <button class="button" type="submit">
+                    Save Changes
+                </button>
+
                 <a class="button cancel" href="{% url 'dashboard' %}">
                     Cancel
                 </a>
             </div>
+
         </form>
     </div>
 </main>
+
 </body>
 </html>
