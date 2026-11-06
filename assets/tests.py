@@ -69,7 +69,6 @@ class AssetMaintenanceTests(TestCase):
         )
 
         self.assertRedirects(response, reverse("dashboard"))
-
         self.asset.refresh_from_db()
 
         self.assertEqual(self.asset.status, "Under Maintenance")
@@ -233,6 +232,30 @@ class AssetManagementTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Searchable Laptop")
         self.assertEqual(response.context["query"], "Searchable")
+        self.assertEqual(
+            list(response.context["assets"]), [self.asset]
+        )
+
+    def test_dashboard_search_by_asset_id(self):
+        response = self.client.get(
+            reverse("dashboard"),
+            {"q": "TEST-003"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "TEST-003")
+        self.assertEqual(
+            list(response.context["assets"]), [self.asset]
+        )
+
+    def test_dashboard_search_by_brand(self):
+        response = self.client.get(
+            reverse("dashboard"),
+            {"q": "Dell"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Searchable Laptop")
         self.assertEqual(
             list(response.context["assets"]), [self.asset]
         )
