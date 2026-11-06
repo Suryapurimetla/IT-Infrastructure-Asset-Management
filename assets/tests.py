@@ -1,7 +1,11 @@
+
+from datetime import date, timedelta
+
 from django.test import TestCase
 from django.urls import reverse
 
 from .models import Asset, MaintenanceRecord
+
 
 class AssetAllocationTests(TestCase):
     def setUp(self):
@@ -55,7 +59,6 @@ class AssetMaintenanceTests(TestCase):
         self.asset.refresh_from_db()
         self.assertEqual(self.asset.status, "Under Maintenance")
 
-
     def test_maintenance_creates_history_record(self):
         response = self.client.post(
             reverse("maintain_asset", args=[self.asset.pk]),
@@ -94,8 +97,6 @@ class AssetMaintenanceTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Please select a valid status.")
-
-
 
 
 class AssetManagementTests(TestCase):
@@ -137,9 +138,7 @@ class AssetManagementTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, "Asset ID and Name are required."
-        )
+        self.assertContains(response, "Asset ID and Name are required.")
         self.assertEqual(Asset.objects.count(), 1)
 
     def test_add_asset_rejects_duplicate_asset_id(self):
@@ -154,9 +153,7 @@ class AssetManagementTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, "That Asset ID already exists."
-        )
+        self.assertContains(response, "That Asset ID already exists.")
         self.assertEqual(Asset.objects.count(), 1)
 
     def test_add_asset_rejects_invalid_category(self):
@@ -171,9 +168,7 @@ class AssetManagementTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, "Please select a valid category."
-        )
+        self.assertContains(response, "Please select a valid category.")
         self.assertFalse(
             Asset.objects.filter(asset_id="TEST-005").exists()
         )
@@ -214,9 +209,7 @@ class AssetManagementTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, "That Asset ID is already in use."
-        )
+        self.assertContains(response, "That Asset ID is already in use.")
 
         self.asset.refresh_from_db()
         self.assertEqual(self.asset.asset_id, "TEST-003")
@@ -242,4 +235,86 @@ class AssetManagementTests(TestCase):
         self.assertEqual(response.context["query"], "Searchable")
         self.assertEqual(
             list(response.context["assets"]), [self.asset]
+        )
+
+
+class DashboardSummaryTests(TestCase):
+    def setUp(self):
+        today = date.today()
+
+        self.active_asset = Asset.objects.create(
+            asset_id="DASH-001",
+            name="Active Laptop",
+            category="Hardware",
+            status="Available",
+            warranty_expiry=today + timedelta(days=60),
+        )
+
+        self.expiring_asset = Asset.objects.create(
+            asset_id="DASH-002",
+            name="Expiring Monitor",
+            category="Hardware",
+            status="Allocated",
+            warranty_expiry=today + timedelta(days=10),
+        )
+
+        self.expired_asset = Asset.objects.create(
+            asset_id="DASH-003",
+            name="Expired Desktop",
+            category="Hardware",
+            status="Under Maintenance",
+            warranty_expiry=today - timedelta(days=10),
+        )
+
+        self.no_warranty_asset = Asset.objects.create(
+            asset_id="DASH-004",
+            name="No Warranty Keyboard",
+            category="Hardware",
+            status="Available",
+            warranty_expiry=None,
+        )
+
+    def test_dashboard_summary_counts(self):
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.context["total_assets"], 4)
+        self.assertEqual(response.context["available_assets"], 2)
+        self.assertEqual(response.context["allocated_assets"], 1)
+        self.assertEqual(response.context["maintenance_assets"], 1)
+
+        self.assertEqual(response.context["active_warranties"], 1)
+        self.assertEqual(response.context["expiring_warranties"], 1)
+        self.assertEqual(response.context["expired_warranties"], 1)
+        self.assertEqual(response.context["no_warranty_date"], 1)
+
+    def test_dashboard_displays_correct_warranty_statuses(self):
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+
+        assets = {
+            asset.asset_id: asset
+            for asset in response.context["assets"]
+        }
+
+        self.assertEqual(
+            assets["DASH-001"].warranty_status,
+            "Active",
+        )
+
+        self.assertEqual(
+            assets["DASH-002"].warranty_status,
+            "Expiring Soon",
+        )
+
+        self.assertEqual(
+            assets["DASH-003"].warranty_status,
+            "Expired",
+        )
+
+        self.assertEqual(
+            assets["DASH-004"].warranty_status,
+            "No Warranty Date",
         )
