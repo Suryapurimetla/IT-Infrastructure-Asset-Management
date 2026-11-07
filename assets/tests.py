@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Asset, MaintenanceRecord
+from .models import Asset, MaintenanceRecord, AllocationRecord
 
 
 class AssetAllocationTests(TestCase):
@@ -35,6 +35,62 @@ class AssetAllocationTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Please enter the employee name.")
+
+    def test_successful_allocation_creates_history_record(self):
+        response = self.client.post(
+            reverse("allocate_asset", args=[self.asset.pk]),
+            {"allocated_to": "Purvik"},
+        )
+
+        self.assertRedirects(response, reverse("dashboard"))
+
+        record = AllocationRecord.objects.get(asset=self.asset)
+        self.assertEqual(record.employee_name, "Purvik")
+        self.assertIsNone(record.returned_at)
+
+    def test_allocation_rejects_already_allocated_asset(self):
+        self.asset.status = "Allocated"
+        self.asset.save()
+
+        response = self.client.post(
+            reverse("allocate_asset", args=[self.asset.pk]),
+            {"allocated_to": "Purvik"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Only available assets can be allocated."
+        )
+
+        self.asset.refresh_from_db()
+        self.assertEqual(self.asset.status, "Allocated")
+        self.assertEqual(AllocationRecord.objects.count(), 0)
+
+    def test_allocation_rejects_retired_asset(self):
+        self.asset.status = "Retired"
+        self.asset.save()
+
+        response = self.client.post(
+            reverse("allocate_asset", args=[self.asset.pk]),
+            {"allocated_to": "Purvik"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(AllocationRecord.objects.count(), 0)
+
+    def test_allocation_history_displays_records(self):
+        AllocationRecord.objects.create(
+            asset=self.asset,
+            employee_name="Purvik",
+        )
+
+        response = self.client.get(
+            reverse("allocation_history", args=[self.asset.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Purvik")
 
 
 class AssetMaintenanceTests(TestCase):
