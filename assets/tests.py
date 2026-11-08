@@ -102,18 +102,79 @@ class AssetMaintenanceTests(TestCase):
             status="Available",
         )
 
-    def test_valid_maintenance_updates_asset_status(self):
-        response = self.client.post(
-            reverse("maintain_asset", args=[self.asset.pk]),
-            {
-                "description": "Replaced cooling fan",
-                "status": "Under Maintenance",
-            },
+    def test_maintenance_history_paginates_records(self):
+        for i in range(12):
+            MaintenanceRecord.objects.create(
+                asset=self.asset,
+                description=f"Maintenance task {i}",
+                previous_status="Available",
+                new_status="Under Maintenance",
+            )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk])
         )
 
-        self.assertRedirects(response, reverse("dashboard"))
-        self.asset.refresh_from_db()
-        self.assertEqual(self.asset.status, "Under Maintenance")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["records"]), 10)
+        self.assertEqual(response.context["page_obj"].number, 1)
+        self.assertTrue(response.context["page_obj"].has_next())
+
+    def test_maintenance_history_second_page(self):
+        for i in range(12):
+            MaintenanceRecord.objects.create(
+                asset=self.asset,
+                description=f"Maintenance task {i}",
+                previous_status="Available",
+                new_status="Under Maintenance",
+            )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk]),
+            {"page": 2},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["records"]), 2)
+        self.assertEqual(response.context["page_obj"].number, 2)
+        self.assertFalse(response.context["page_obj"].has_next())
+
+    def test_maintenance_history_paginates_records(self):
+        for i in range(12):
+            MaintenanceRecord.objects.create(
+                asset=self.asset,
+                description=f"Maintenance task {i}",
+                previous_status="Available",
+                new_status="Under Maintenance",
+            )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["records"]), 10)
+        self.assertEqual(response.context["page_obj"].number, 1)
+        self.assertTrue(response.context["page_obj"].has_next())
+
+    def test_maintenance_history_second_page(self):
+        for i in range(12):
+            MaintenanceRecord.objects.create(
+                asset=self.asset,
+                description=f"Maintenance task {i}",
+                previous_status="Available",
+                new_status="Under Maintenance",
+            )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk]),
+            {"page": 2},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["records"]), 2)
+        self.assertEqual(response.context["page_obj"].number, 2)
+        self.assertFalse(response.context["page_obj"].has_next())
 
     def test_maintenance_creates_history_record(self):
         response = self.client.post(

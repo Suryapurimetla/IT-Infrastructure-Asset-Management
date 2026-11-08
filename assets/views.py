@@ -1,4 +1,4 @@
-
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
@@ -386,7 +386,12 @@ def maintenance_history(request, asset_id):
         '-maintenance_date'
     )
 
+    paginator = Paginator(records, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'assets/maintenance_history.html', {
         'asset': asset,
-        'records': records,
+        'records': page_obj,
+        'page_obj': page_obj,
     })
