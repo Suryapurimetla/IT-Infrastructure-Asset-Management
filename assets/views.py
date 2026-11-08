@@ -1,4 +1,4 @@
-
+from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
@@ -358,15 +358,16 @@ def maintain_asset(request, asset_id):
 
         previous_status = asset.status
 
-        MaintenanceRecord.objects.create(
-            asset=asset,
-            description=description,
-            previous_status=previous_status,
-            new_status=status,
-        )
+        with transaction.atomic():
+            MaintenanceRecord.objects.create(
+                asset=asset,
+                description=description,
+                previous_status=previous_status,
+                new_status=status,
+            )
 
-        asset.status = status
-        asset.save()
+            asset.status = status
+            asset.save(update_fields=['status'])
 
         return redirect('dashboard')
 
