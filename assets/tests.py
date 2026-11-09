@@ -1,4 +1,4 @@
-
+from unittest.mock import patch
 from datetime import date, timedelta
 
 from django.test import TestCase
@@ -195,6 +195,29 @@ class AssetMaintenanceTests(TestCase):
         self.assertEqual(record.description, "Replaced cooling fan")
         self.assertEqual(record.previous_status, "Available")
         self.assertEqual(record.new_status, "Under Maintenance")
+
+    def test_maintenance_record_rolls_back_if_asset_update_fails(self):
+        with patch.object(
+            Asset,
+            'save',
+            side_effect=RuntimeError('Simulated asset update failure'),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    reverse("maintain_asset", args=[self.asset.pk]),
+                    {
+                        "description": "Replaced cooling fan",
+                        "status": "Under Maintenance",
+                    },
+                )
+
+        self.assertEqual(
+            MaintenanceRecord.objects.filter(asset=self.asset).count(),
+            0,
+        )
+
+        self.asset.refresh_from_db()
+        self.assertEqual(self.asset.status, "Available")
 
     def test_maintenance_requires_description(self):
         response = self.client.post(
