@@ -1,3 +1,4 @@
+
 from unittest.mock import patch
 from datetime import date, timedelta
 
@@ -139,7 +140,7 @@ class AssetMaintenanceTests(TestCase):
         self.assertEqual(response.context["page_obj"].number, 2)
         self.assertFalse(response.context["page_obj"].has_next())
 
-    def test_maintenance_history_paginates_records(self):
+    def test_maintenance_history_paginates_records_duplicate(self):
         for i in range(12):
             MaintenanceRecord.objects.create(
                 asset=self.asset,
@@ -157,7 +158,7 @@ class AssetMaintenanceTests(TestCase):
         self.assertEqual(response.context["page_obj"].number, 1)
         self.assertTrue(response.context["page_obj"].has_next())
 
-    def test_maintenance_history_second_page(self):
+    def test_maintenance_history_second_page_duplicate(self):
         for i in range(12):
             MaintenanceRecord.objects.create(
                 asset=self.asset,
@@ -528,4 +529,32 @@ class DashboardSummaryTests(TestCase):
             assets["BOUNDARY-003"].warranty_status,
             "Active",
         )
-        
+
+    # Issue #26: Warranty Expiry Alerts
+    def test_warranty_expiry_alerts_show_only_next_30_days(self):
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+
+        alert_ids = [
+            asset.asset_id
+            for asset in response.context["expiring_assets"]
+        ]
+
+        self.assertIn("DASH-002", alert_ids)
+        self.assertNotIn("DASH-001", alert_ids)
+        self.assertNotIn("DASH-003", alert_ids)
+        self.assertNotIn("DASH-004", alert_ids)
+
+    def test_warranty_expiry_alert_shows_days_remaining(self):
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+
+        expiring_asset = next(
+            asset
+            for asset in response.context["expiring_assets"]
+            if asset.asset_id == "DASH-002"
+        )
+
+        self.assertEqual(expiring_asset.days_remaining, 10)
