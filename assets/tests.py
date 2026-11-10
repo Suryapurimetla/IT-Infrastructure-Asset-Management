@@ -481,3 +481,51 @@ class DashboardSummaryTests(TestCase):
             assets["DASH-004"].warranty_status,
             "No Warranty Date",
         )
+
+    def test_warranty_status_boundary_dates(self):
+        today = date.today()
+
+        Asset.objects.create(
+            asset_id="BOUNDARY-001",
+            name="Warranty Expires Today",
+            category="Hardware",
+            warranty_expiry=today,
+        )
+
+        Asset.objects.create(
+            asset_id="BOUNDARY-002",
+            name="Warranty Expires in 30 Days",
+            category="Hardware",
+            warranty_expiry=today + timedelta(days=30),
+        )
+
+        Asset.objects.create(
+            asset_id="BOUNDARY-003",
+            name="Warranty Expires in 31 Days",
+            category="Hardware",
+            warranty_expiry=today + timedelta(days=31),
+        )
+
+        response = self.client.get(reverse("dashboard"))
+        self.assertEqual(response.status_code, 200)
+
+        assets = {
+            asset.asset_id: asset
+            for asset in response.context["assets"]
+        }
+
+        self.assertEqual(
+            assets["BOUNDARY-001"].warranty_status,
+            "Expiring Soon",
+        )
+
+        self.assertEqual(
+            assets["BOUNDARY-002"].warranty_status,
+            "Expiring Soon",
+        )
+
+        self.assertEqual(
+            assets["BOUNDARY-003"].warranty_status,
+            "Active",
+        )
+        
