@@ -1,4 +1,5 @@
 
+from unittest.mock import patch
 from datetime import date, timedelta
 
 from django.test import TestCase
@@ -102,18 +103,79 @@ class AssetMaintenanceTests(TestCase):
             status="Available",
         )
 
-    def test_valid_maintenance_updates_asset_status(self):
-        response = self.client.post(
-            reverse("maintain_asset", args=[self.asset.pk]),
-            {
-                "description": "Replaced cooling fan",
-                "status": "Under Maintenance",
-            },
+    def test_maintenance_history_paginates_records(self):
+        for i in range(12):
+            MaintenanceRecord.objects.create(
+                asset=self.asset,
+                description=f"Maintenance task {i}",
+                previous_status="Available",
+                new_status="Under Maintenance",
+            )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk])
         )
 
-        self.assertRedirects(response, reverse("dashboard"))
-        self.asset.refresh_from_db()
-        self.assertEqual(self.asset.status, "Under Maintenance")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["records"]), 10)
+        self.assertEqual(response.context["page_obj"].number, 1)
+        self.assertTrue(response.context["page_obj"].has_next())
+
+    def test_maintenance_history_second_page(self):
+        for i in range(12):
+            MaintenanceRecord.objects.create(
+                asset=self.asset,
+                description=f"Maintenance task {i}",
+                previous_status="Available",
+                new_status="Under Maintenance",
+            )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk]),
+            {"page": 2},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["records"]), 2)
+        self.assertEqual(response.context["page_obj"].number, 2)
+        self.assertFalse(response.context["page_obj"].has_next())
+
+    def test_maintenance_history_paginates_records_duplicate(self):
+        for i in range(12):
+            MaintenanceRecord.objects.create(
+                asset=self.asset,
+                description=f"Maintenance task {i}",
+                previous_status="Available",
+                new_status="Under Maintenance",
+            )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["records"]), 10)
+        self.assertEqual(response.context["page_obj"].number, 1)
+        self.assertTrue(response.context["page_obj"].has_next())
+
+    def test_maintenance_history_second_page_duplicate(self):
+        for i in range(12):
+            MaintenanceRecord.objects.create(
+                asset=self.asset,
+                description=f"Maintenance task {i}",
+                previous_status="Available",
+                new_status="Under Maintenance",
+            )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk]),
+            {"page": 2},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["records"]), 2)
+        self.assertEqual(response.context["page_obj"].number, 2)
+        self.assertFalse(response.context["page_obj"].has_next())
 
     def test_maintenance_creates_history_record(self):
         response = self.client.post(
@@ -134,6 +196,29 @@ class AssetMaintenanceTests(TestCase):
         self.assertEqual(record.description, "Replaced cooling fan")
         self.assertEqual(record.previous_status, "Available")
         self.assertEqual(record.new_status, "Under Maintenance")
+
+    def test_maintenance_record_rolls_back_if_asset_update_fails(self):
+        with patch.object(
+            Asset,
+            'save',
+            side_effect=RuntimeError('Simulated asset update failure'),
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    reverse("maintain_asset", args=[self.asset.pk]),
+                    {
+                        "description": "Replaced cooling fan",
+                        "status": "Under Maintenance",
+                    },
+                )
+
+        self.assertEqual(
+            MaintenanceRecord.objects.filter(asset=self.asset).count(),
+            0,
+        )
+
+        self.asset.refresh_from_db()
+        self.assertEqual(self.asset.status, "Available")
 
     def test_maintenance_requires_description(self):
         response = self.client.post(
@@ -397,3 +482,79 @@ class DashboardSummaryTests(TestCase):
             assets["DASH-004"].warranty_status,
             "No Warranty Date",
         )
+
+    def test_warranty_status_boundary_dates(self):
+        today = date.today()
+
+        Asset.objects.create(
+            asset_id="BOUNDARY-001",
+            name="Warranty Expires Today",
+            category="Hardware",
+            warranty_expiry=today,
+        )
+
+        Asset.objects.create(
+            asset_id="BOUNDARY-002",
+            name="Warranty Expires in 30 Days",
+            category="Hardware",
+            warranty_expiry=today + timedelta(days=30),
+        )
+
+        Asset.objects.create(
+            asset_id="BOUNDARY-003",
+            name="Warranty Expires in 31 Days",
+            category="Hardware",
+            warranty_expiry=today + timedelta(days=31),
+        )
+
+        response = self.client.get(reverse("dashboard"))
+        self.assertEqual(response.status_code, 200)
+
+        assets = {
+            asset.asset_id: asset
+            for asset in response.context["assets"]
+        }
+
+        self.assertEqual(
+            assets["BOUNDARY-001"].warranty_status,
+            "Expiring Soon",
+        )
+
+        self.assertEqual(
+            assets["BOUNDARY-002"].warranty_status,
+            "Expiring Soon",
+        )
+
+        self.assertEqual(
+            assets["BOUNDARY-003"].warranty_status,
+            "Active",
+        )
+
+    # Issue #26: Warranty Expiry Alerts
+    def test_warranty_expiry_alerts_show_only_next_30_days(self):
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+
+        alert_ids = [
+            asset.asset_id
+            for asset in response.context["expiring_assets"]
+        ]
+
+        self.assertIn("DASH-002", alert_ids)
+        self.assertNotIn("DASH-001", alert_ids)
+        self.assertNotIn("DASH-003", alert_ids)
+        self.assertNotIn("DASH-004", alert_ids)
+
+    def test_warranty_expiry_alert_shows_days_remaining(self):
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+
+        expiring_asset = next(
+            asset
+            for asset in response.context["expiring_assets"]
+            if asset.asset_id == "DASH-002"
+        )
+
+        self.assertEqual(expiring_asset.days_remaining, 10)
