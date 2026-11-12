@@ -2,10 +2,28 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Process variables take precedence, then .env.local, then .env.
+# Disable interpolation so passwords containing ${...} remain literal.
+load_dotenv(BASE_DIR / '.env.local', override=False, interpolate=False)
+load_dotenv(BASE_DIR / '.env', override=False, interpolate=False)
+
 # Security settings
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY') or os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        'SECRET_KEY is required. Set it in the project-root .env.local '
+        'or process environment (DJANGO_SECRET_KEY is also supported).'
+    )
+if not os.environ.get('DB_PASSWORD'):
+    raise ImproperlyConfigured(
+        'DB_PASSWORD is required. Set it in the project-root .env.local '
+        'or process environment.'
+    )
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']

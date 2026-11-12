@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from .models import Asset, MaintenanceRecord
+from .models import Asset, MaintenanceRecord, AllocationRecord
 
 class AssetAllocationTests(TestCase):
     def setUp(self):
@@ -242,4 +245,162 @@ class AssetManagementTests(TestCase):
         self.assertEqual(response.context["query"], "Searchable")
         self.assertEqual(
             list(response.context["assets"]), [self.asset]
+        )
+
+
+# ==========================================
+# INTEGRATION TESTS - SPRINT 2
+# ==========================================
+
+
+class AssetIntegrationTests(TestCase):
+
+    def setUp(self):
+        self.asset = Asset.objects.create(
+            asset_id="INT-001",
+            name="Integration Test Laptop",
+            category="Hardware",
+            brand="Dell",
+            status="Available",
+        )
+
+    def test_added_asset_appears_on_dashboard(self):
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Integration Test Laptop")
+        self.assertEqual(response.context["total_assets"], 1)
+
+    def test_allocation_creates_history_and_updates_dashboard(self):
+        response = self.client.post(
+            reverse("allocate_asset", args=[self.asset.pk]),
+            {"allocated_to": "Integration Employee"},
+        )
+
+        self.assertRedirects(response, reverse("dashboard"))
+
+        self.asset.refresh_from_db()
+
+        self.assertEqual(self.asset.status, "Allocated")
+        self.assertEqual(
+            self.asset.allocated_to,
+            "Integration Employee"
+        )
+
+        record = AllocationRecord.objects.get(asset=self.asset)
+
+        self.assertEqual(
+            record.employee_name,
+            "Integration Employee"
+        )
+
+        dashboard = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(dashboard.context["allocated_assets"], 1)
+
+    def test_return_asset_updates_status_and_history(self):
+        AllocationRecord.objects.create(
+            asset=self.asset,
+            employee_name="Integration Employee",
+        )
+
+        self.asset.status = "Allocated"
+        self.asset.allocated_to = "Integration Employee"
+        self.asset.save()
+
+        response = self.client.post(
+            reverse("return_asset", args=[self.asset.pk])
+        )
+
+        self.assertRedirects(response, reverse("dashboard"))
+
+        self.asset.refresh_from_db()
+
+        self.assertEqual(self.asset.status, "Available")
+        self.assertEqual(self.asset.allocated_to, "")
+
+        record = AllocationRecord.objects.get(asset=self.asset)
+
+        self.assertIsNotNone(record.returned_at)
+
+    def test_allocation_history_displays_records(self):
+        AllocationRecord.objects.create(
+            asset=self.asset,
+            employee_name="History Employee",
+        )
+
+        response = self.client.get(
+            reverse("allocation_history", args=[self.asset.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "History Employee")
+
+    def test_maintenance_history_displays_records(self):
+        MaintenanceRecord.objects.create(
+            asset=self.asset,
+            description="Integration maintenance",
+            previous_status="Available",
+            new_status="Under Maintenance",
+        )
+
+        response = self.client.get(
+            reverse("maintenance_history", args=[self.asset.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Integration maintenance")
+
+    def test_maintenance_updates_dashboard_status(self):
+        self.client.post(
+            reverse("maintain_asset", args=[self.asset.pk]),
+            {
+                "description": "Integration testing maintenance",
+                "status": "Under Maintenance",
+            },
+        )
+
+        self.asset.refresh_from_db()
+
+        self.assertEqual(self.asset.status, "Under Maintenance")
+
+        dashboard = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(dashboard.context["maintenance_assets"], 1)
+
+    def test_warranty_expiring_soon_appears_in_dashboard(self):
+        self.asset.warranty_expiry = (
+            timezone.localdate() + timedelta(days=10)
+        )
+        self.asset.save()
+
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Expiring Soon")
+
+        self.assertEqual(response.context["expiring_warranties"], 1)
+
+    def test_edited_asset_is_searchable(self):
+        response = self.client.post(
+            reverse("edit_asset", args=[self.asset.pk]),
+            {
+                "asset_id": "INT-001",
+                "name": "Updated Integration Laptop",
+                "category": "Hardware",
+                "status": "Available",
+            },
+        )
+
+        self.assertRedirects(response, reverse("dashboard"))
+
+        search_response = self.client.get(
+            reverse("dashboard"),
+            {"q": "Updated Integration Laptop"},
+        )
+
+        self.assertEqual(search_response.status_code, 200)
+        self.assertContains(
+            search_response,
+            "Updated Integration Laptop"
         )

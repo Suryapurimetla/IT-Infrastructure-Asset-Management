@@ -5,33 +5,37 @@
 **Team 08**
 
 ## Report Status
-Latest test run — uncommitted working-tree version
+Latest test run: Sprint 2 integration testing (results supplied by the project team)
 
-- Date: 05 November 2026
-- Branch: `feature/maintenance-history`
-- Changes tested: Uncommitted working-tree changes
+- Date: Not supplied for the latest run
+- Branch: Not supplied for the latest run
+- Changes tested: Sprint 2 integration testing; commit status not supplied
 
 ## Test Environment
-- Operating System: Windows
-- Python: 3.12.10
-- Django: 5.2.18
+- Operating System: Windows (previously recorded; not reverified for this run)
+- Python: 3.12.10 (previously recorded; not reverified for this run)
+- Django: 5.2.18 (previously recorded; not reverified for this run)
 - Database: MySQL
 - Test database: Django test database
 
 ## Test Command
 
-`python manage.py test assets`
+`coverage erase`
+
+`coverage run --branch manage.py test assets`
+
+`coverage report`
 
 ## Results Summary
 
 | Measure | Result |
 |---|---:|
-| Tests found | 14 |
-| Passed | 14 |
+| Tests found | 22 |
+| Passed | 22 |
 | Failed | 0 |
 | Errors | 0 |
-| Skipped | 0 |
-| Execution time | 0.209 seconds |
+| Skipped | Not supplied |
+| Execution time | 0.843 seconds |
 
 ## Tests Executed
 
@@ -51,6 +55,14 @@ Latest test run — uncommitted working-tree version
 | Edit asset rejects duplicate asset ID | Pass |
 | Delete asset successfully | Pass |
 | Dashboard search by asset name | Pass |
+| Added asset appears on dashboard | Pass |
+| Allocation creates history and updates dashboard | Pass |
+| Return asset updates status and history | Pass |
+| Allocation history displays records | Pass |
+| Maintenance history displays records | Pass |
+| Maintenance updates dashboard status | Pass |
+| Warranty expiring soon appears in dashboard | Pass |
+| Edited asset is searchable | Pass |
 
 ## System Check
 
@@ -58,7 +70,7 @@ Django system check completed successfully with no issues.
 
 ## Conclusion
 
-All 14 automated tests passed successfully. No failures or errors were reported. The test database was created for the test execution and destroyed after completion.
+All 22 automated tests passed successfully. No failures or errors were reported. Results are supplied by the project team; no tests were rerun to prepare this report.
 
 ## Scope and Limitations
 
@@ -69,14 +81,19 @@ The automated tests cover:
 - Dashboard search
 - Asset allocation
 - Maintenance status updates
-- Maintenance history creation
+- Maintenance history creation and display
+- Allocation history creation and display
+- Asset returns and history updates
+- Dashboard status counts and expiring warranty display
+- Search after asset editing
 
 The automated tests do not establish complete system validation against every SRS requirement.
 
 ## Coverage Reference
 
-- Statement coverage: 88% (statement-only coverage run).
-- Branch-enabled combined coverage: 84%.
+- Statement coverage: 372/393 = 94.66% (from the branch-enabled run).
+- Standalone branch coverage: 39/56 = 69.64%.
+- Branch-enabled combined coverage: 92%.
 - Refer to the separate Code Coverage Report and Branch Coverage Report for details.
 
 ## Next Steps
