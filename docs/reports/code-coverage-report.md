@@ -1,42 +1,43 @@
 # Code Coverage Report
 
 ## Project
-
-**IT Infrastructure and Asset Management System**
+**IT Infrastructure and Asset Management System**  
 **Team 08**
 
 ## Execution Details
+- Execution date: 14 November 2026
+- Branch: Not supplied
+- Commit: Not supplied
+- Coverage tool: Coverage.py 7.17.2
+- Django: 5.2.18
+- Python version and operating-system details: Not reverified for this run
 
-- Date: Not supplied for the latest run
-- Branch: Not supplied for the latest run
-- Commit: Not supplied for the latest run
-- Coverage Tool: Coverage.py 7.17.2 (previously recorded; not reverified for this run)
-- Python: 3.12.10 (previously recorded; not reverified for this run)
-- Django: 5.2.18 (previously recorded; not reverified for this run)
-
-## Test Command
-
-`coverage erase`
+## Test Commands
 
 `coverage run --branch manage.py test assets`
 
 `coverage report`
 
+`coverage html`
+
 ## Coverage Results
 
 | Measure | Result |
 |---|---:|
-| Total statements | 393 |
-| Covered statements | 372 |
-| Missing statements | 21 |
-| Statement coverage | 372/393 = 94.66% |
-| Covered branches | 39/56 = 69.64% |
-| Combined coverage | 92% |
-| Tests executed | 22 |
-| Tests passed | 22 |
+| Total statements | 420 |
+| Missed statements | 17 |
+| Covered statements | 403 |
+| Statement coverage | 403/420 = 95.95% |
+| Total branches | 56 |
+| Partial branches | 15 |
+| Covered branches | 41 |
+| Standalone branch coverage | 41/56 = 73.21% |
+| Combined statement-and-branch coverage | 93% |
+| Tests executed | 26 |
+| Tests passed | 26 |
 | Tests failed | 0 |
 | Errors | 0 |
-| Execution time | 0.843 seconds |
+| Execution time | 0.571 seconds |
 | Django system check | No issues |
 
 ## File-wise Coverage
@@ -44,40 +45,35 @@
 | File | Statements | Missed | Branches | Partial | Coverage |
 |---|---:|---:|---:|---:|---:|
 | assets/models.py | 32 | 3 | 0 | 0 | 91% |
-| assets/tests.py | 148 | 0 | 0 | 0 | 100% |
-| assets/views.py | 136 | 14 | 50 | 14 | 85% |
+| assets/tests.py | 175 | 0 | 0 | 0 | 100% |
+| assets/views.py | 136 | 10 | 50 | 12 | 88% |
 | config/settings.py | 28 | 2 | 4 | 2 | 88% |
 | manage.py | 11 | 2 | 2 | 1 | 77% |
-| TOTAL | 393 | 21 | 56 | 17 | 92% |
+| TOTAL | 420 | 17 | 56 | 15 | 93% |
 
-The table reproduces the supplied coverage output, including its TOTAL row. Per-file percentages are from the branch-enabled run; they are not standalone statement coverage. No updated per-file figures were supplied for files omitted from this table.
+Other listed files in the terminal output, including the app configuration, admin module, migrations, URL modules and package initializers, reported 100% coverage.
 
 ## Observations
 
-The overall statement coverage achieved is 372/393 = 94.66%. Overall combined statement and branch coverage is 92%.
+The latest branch-enabled run measured 420 statements and 56 branches. It recorded 17 missed statements and 15 partial branches.
 
-The assets/views.py module has 85% combined coverage, with 14 missed statements and 14 partial branches in the supplied output.
+The overall statement coverage is 95.95%. Standalone branch coverage is 73.21%, and combined statement-and-branch coverage is reported as 93%.
 
-The assets/models.py module has 91% coverage.
-
-The assets/tests.py module has 100% coverage. The latest supplied output does not include assets/urls.py.
-
-Further test cases can be added to exercise the remaining uncovered application code.
+The `assets/views.py` module reported 88% combined coverage, with 10 missed statements and 12 partial branches. The `assets/tests.py` module reported 100% coverage.
 
 ## Limitations
 
-This report reflects the 22 automated tests from the latest Sprint 2 integration testing run, using results supplied by the project team. The execution date and commit were not supplied. No tests were rerun to prepare this report.
+Coverage indicates which measured statements and branches were exercised by this test run. It does not prove that all requirements, user workflows, or production conditions have been validated.
 
-The report does not establish complete testing of all functional requirements.
+The execution branch and commit were not supplied. Python version and operating-system details were not reverified for this run.
 
 ## Conclusion
 
-All 22 automated tests passed successfully. The application achieved 94.66% statement coverage, 69.64% standalone branch coverage, and 92% overall combined coverage. Additional testing can improve coverage of the remaining uncovered statements, particularly in the application views.
+All 26 automated tests passed during the branch-enabled coverage run. The application achieved 95.95% statement coverage, 73.21% standalone branch coverage, and 93% combined coverage.
 
 ## Next Steps
 
+- Review the remaining missed statements and partial branches, especially in application views.
+- Add tests where uncovered paths represent important application behaviour.
 - Perform system validation against the SRS and Test Plan.
-- Review uncovered statements.
-- Add further automated tests where required.
-- Repeat coverage measurement after final changes.
-- Update this report after testing the committed version.
+- Repeat coverage measurement after final changes and on the committed version.

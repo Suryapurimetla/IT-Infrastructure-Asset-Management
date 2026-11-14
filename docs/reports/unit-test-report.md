@@ -1,41 +1,39 @@
 # Unit Test Report
 
 ## Project
-**IT Infrastructure and Asset Management System**
+**IT Infrastructure and Asset Management System**  
 **Team 08**
 
-## Report Status
-Latest test run: Sprint 2 integration testing (results supplied by the project team)
-
-- Date: Not supplied for the latest run
-- Branch: Not supplied for the latest run
-- Changes tested: Sprint 2 integration testing; commit status not supplied
-
-## Test Environment
-- Operating System: Windows (previously recorded; not reverified for this run)
-- Python: 3.12.10 (previously recorded; not reverified for this run)
-- Django: 5.2.18 (previously recorded; not reverified for this run)
-- Database: MySQL
+## Execution Details
+- Execution date: 14 November 2026
+- Branch: Not supplied
+- Commit: Not supplied
+- Django: 5.2.18
 - Test database: Django test database
+- Coverage.py: 7.17.2 (used for the subsequent coverage run)
+- Python version and operating-system details: Not reverified for this run
 
 ## Test Command
 
-`coverage erase`
-
-`coverage run --branch manage.py test assets`
-
-`coverage report`
+`python manage.py test assets --verbosity 2`
 
 ## Results Summary
 
 | Measure | Result |
 |---|---:|
-| Tests found | 22 |
-| Passed | 22 |
+| Tests found | 26 |
+| Passed | 26 |
 | Failed | 0 |
 | Errors | 0 |
-| Skipped | Not supplied |
-| Execution time | 0.843 seconds |
+| Skipped | 0 |
+| Execution time | 0.524 seconds |
+| Django system check | No issues |
+
+A separate branch-enabled coverage run also completed successfully:
+
+`coverage run --branch manage.py test assets`
+
+That run found and passed all 26 tests in 0.571 seconds.
 
 ## Tests Executed
 
@@ -62,6 +60,10 @@ Latest test run: Sprint 2 integration testing (results supplied by the project t
 | Maintenance history displays records | Pass |
 | Maintenance updates dashboard status | Pass |
 | Warranty expiring soon appears in dashboard | Pass |
+| Expired warranty status on dashboard | Pass |
+| Active warranty status on dashboard | Pass |
+| Warranty expiring today | Pass |
+| Warranty expiring exactly in 30 days | Pass |
 | Edited asset is searchable | Pass |
 
 ## System Check
@@ -70,34 +72,25 @@ Django system check completed successfully with no issues.
 
 ## Conclusion
 
-All 22 automated tests passed successfully. No failures or errors were reported. Results are supplied by the project team; no tests were rerun to prepare this report.
+All 26 automated tests passed in the latest run. No failures, errors, or skipped tests were reported. The test suite covers asset registration and validation, editing and deletion, dashboard search, allocation and return workflows, maintenance history, and warranty status scenarios.
 
 ## Scope and Limitations
 
-The automated tests cover:
-- Asset registration and validation
-- Duplicate Asset ID prevention
-- Asset editing and deletion
-- Dashboard search
-- Asset allocation
-- Maintenance status updates
-- Maintenance history creation and display
-- Allocation history creation and display
-- Asset returns and history updates
-- Dashboard status counts and expiring warranty display
-- Search after asset editing
+The automated tests provide evidence for the scenarios listed above. They do not, by themselves, establish complete system validation against every functional and non-functional requirement in the SRS or Test Plan.
 
-The automated tests do not establish complete system validation against every SRS requirement.
+The execution branch and commit were not supplied. The Python version and operating-system details were not reverified for this run.
 
 ## Coverage Reference
 
-- Statement coverage: 372/393 = 94.66% (from the branch-enabled run).
-- Standalone branch coverage: 39/56 = 69.64%.
-- Branch-enabled combined coverage: 92%.
-- Refer to the separate Code Coverage Report and Branch Coverage Report for details.
+The latest branch-enabled coverage run reported:
+- Statement coverage: 403/420 = 95.95%.
+- Standalone branch coverage: 41/56 = 73.21%.
+- Combined statement-and-branch coverage: 93%.
+
+Refer to the separate Code Coverage Report and Branch Coverage Report for details.
 
 ## Next Steps
 
-- Perform system validation against the submitted SRS and Test Plan.
+- Perform or complete system validation against the submitted SRS and Test Plan.
 - Review uncovered statements and branches.
-- Update the report after final testing on the committed version.
+- Update this report after testing the final committed version.

@@ -1,22 +1,18 @@
 # Branch Coverage Report
 
 ## Project
-
-**IT Infrastructure and Asset Management System**
+**IT Infrastructure and Asset Management System**  
 **Team 08**
 
 ## Execution Details
+- Execution date: 14 November 2026
+- Branch: Not supplied
+- Commit: Not supplied
+- Coverage tool: Coverage.py 7.17.2
+- Django: 5.2.18
+- Python version and operating-system details: Not reverified for this run
 
-- Date: Not supplied for the latest run
-- Branch: Not supplied for the latest run
-- Commit: Not supplied for the latest run
-- Coverage Tool: Coverage.py 7.17.2 (previously recorded; not reverified for this run)
-- Python: 3.12.10 (previously recorded; not reverified for this run)
-- Django: 5.2.18 (previously recorded; not reverified for this run)
-
-## Test Command
-
-`coverage erase`
+## Test Commands
 
 `coverage run --branch manage.py test assets`
 
@@ -26,53 +22,44 @@
 
 | Measure | Result |
 |---|---:|
-| Total statements | 393 |
-| Covered statements | 372 |
-| Missing statements | 21 |
-| Statement coverage | 372/393 = 94.66% |
+| Total statements | 420 |
+| Covered statements | 403 |
+| Missing statements | 17 |
+| Statement coverage | 403/420 = 95.95% |
 | Total branches | 56 |
-| Covered branches | 39 |
-| Missing branches | 17 |
-| Partial (coverage report) | 17 |
-| Standalone branch coverage | 39/56 = 69.64% |
-| Combined coverage | 92% |
-| Tests executed | 22 |
-| Tests passed | 22 |
+| Covered branches | 41 |
+| Missing branches | 15 |
+| Partial branches reported | 15 |
+| Standalone branch coverage | 41/56 = 73.21% |
+| Combined coverage | 93% |
+| Tests executed | 26 |
+| Tests passed | 26 |
 | Tests failed | 0 |
 | Errors | 0 |
-| Execution time | 0.843 seconds |
+| Execution time | 0.571 seconds |
 | Django system check | No issues |
 
 ## Observations
 
-The branch-enabled coverage execution identified 56 branches across the application.
+The branch-enabled coverage execution identified 56 branches.
 
-Out of these, 39 branches were covered and 17 branches were missing.
+The coverage report recorded 15 partial branches. Based on the report's branch count and partial-branch count, 41 branches were covered, giving standalone branch coverage of 73.21%.
 
-The report also identified 17 partial branches, indicating that some alternative decision paths have not been fully exercised.
-
-The application achieved 69.64% standalone branch coverage and 92% combined statement and branch coverage.
-
-Further testing can improve coverage of alternative conditional paths, particularly in application views.
+The application achieved 95.95% statement coverage and 93% combined statement-and-branch coverage.
 
 ## Limitations
 
-This report reflects the 22 automated tests from the latest Sprint 2 integration testing run, using results supplied by the project team. The execution date and commit were not supplied. No tests were rerun to prepare this report.
+This report reflects the 26 automated tests from the branch-enabled run on 14 November 2026. The execution branch and commit were not supplied.
 
-The report does not establish complete branch coverage or complete validation of all application requirements.
+Branch coverage measures whether decision outcomes were exercised; it does not establish complete validation of all application requirements or all possible input combinations.
 
 ## Conclusion
 
-All 22 automated tests passed successfully during branch-enabled coverage execution.
-
-The application achieved 69.64% standalone branch coverage and 92% combined coverage.
-
-Additional test scenarios are recommended to exercise the remaining uncovered branches.
+All 26 automated tests passed during branch-enabled coverage execution. The application achieved 73.21% standalone branch coverage and 93% combined coverage.
 
 ## Next Steps
 
-- Review missing and partially covered branches.
-- Add automated tests for alternative conditional outcomes.
+- Review the 15 partial branches, particularly in application views.
+- Add automated tests for important alternative conditional outcomes where appropriate.
 - Perform system validation against the SRS and Test Plan.
-- Repeat branch coverage measurement after additional tests.
-- Update this report after testing the committed version.
+- Repeat branch coverage measurement after final changes and on the committed version.
