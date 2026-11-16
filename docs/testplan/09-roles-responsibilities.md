@@ -2,24 +2,23 @@
 
 ## 9.1 Team Responsibilities
 
-Team 08 is responsible for preparing test documentation, executing planned tests, recording results, identifying defects, and verifying fixes.
+Team 08 is responsible for preparing and maintaining project documentation, implementing the system, executing planned tests, recording results, identifying defects, and verifying fixes.
 
-## 9.2 Roles
+## 9.2 Roles and Responsibilities
 
-| Role | Responsibilities |
-|---|---|
-| Project Coordinator | Coordinate testing activities, monitor progress, and ensure deliverables are prepared. |
-| Requirements and Documentation Lead | Maintain consistency between the SRS, SAD, STP, and test cases. |
-| Development Team | Implement features, investigate defects, and provide corrected versions for retesting. |
-| Test Execution Team | Execute test cases, record actual results, and report failures. |
-| Security Validation Responsibility | Check input validation, access restrictions, and protection of sensitive data where implemented. |
+| Team Member | Role | Responsibilities |
+|---|---|---|
+| Akash Ramesh (PES1UG24AM212) | SRS Owner | Prepare and maintain the Software Requirements Specification (SRS), including functional and non-functional requirements. |
+| Purvik Venkatesh (PES1UG24AM211) | SAD Owner | Prepare and maintain the Software Architecture and Design Specification (SAD), including system architecture and component design. |
+| P. Jaya Surya (PES1UG24AM210) | STP Owner | Prepare and maintain the Software Test Plan (STP), coordinate test-case preparation, document test execution results, and maintain testing reports. |
+| Sreyaesh Peruri (PES1UG24AM189) | Documentation Reviewer and Testing Support | Review the SRS, SAD, and STP for consistency, assist with test execution, track defects, and support documentation review. |
 
-Team members may perform multiple roles depending on workload and task allocation.
+All team members will contribute to system development, testing, reviewing deliverables, and maintaining project files and supporting evidence.
 
 ## 9.3 Defect Communication
 
-Defects will be recorded in the project repository or the team's agreed issue-tracking method. The responsible team members will review the issues, implement fixes where necessary, and perform retesting.
+Defects identified during testing will be recorded in the project repository or the team's agreed issue-tracking method. The responsible development team members will investigate and implement necessary fixes. The testing team will verify the fixes and perform regression testing where appropriate.
 
 ## 9.4 Review and Approval
 
-The team will review the completed test documentation and results before submission. Any formal approval required by the course will be obtained from the designated reviewer or faculty member.
+The SRS, SAD, and STP will be reviewed by the respective document owners and other team members before final submission. Sreyaesh Peruri will assist in checking consistency across the documents. Formal approval will be obtained from the designated reviewer or faculty member, as required by the course.
