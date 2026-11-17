@@ -2,8 +2,8 @@
 
 | Role | Name | Signature / Date |
 |---|---|---|
-| Product Owner / Project Lead | P.Jaya Surya | |
-| QA Lead | Akash Ramesh | |
-| Dev Lead | Purvik Venkatesh | |
-| Security Test Engineer | Sreyaesh Peruri | |
+| SRS Owner | Akash Ramesh | |
+| SAD Owner | Purvik Venkatesh | |
+| STP Owner | P. Jaya Surya | |
+| Document Reviewer | Sreyaesh Peruri | |
 | Course Coordinator | | |
